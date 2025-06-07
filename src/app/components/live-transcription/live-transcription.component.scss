@@ -304,6 +304,19 @@
   }
 }
 
+.processing-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 1rem 0;
+  color: theme-color('primary');
+
+  .spinner {
+    animation: spin 1s linear infinite;
+  }
+}
+
 @keyframes pulse {
 
   0%,
@@ -326,6 +339,11 @@
   50% {
     opacity: 0.3;
   }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 @media (max-width: 768px) {

@@ -1,4 +1,22 @@
 <div class="live-transcription-container">
+  <!-- Recording controls -->
+  <div class="controls">
+    <button (click)="startRecording()" [disabled]="isRecording || isProcessing">
+      <lucide-icon name="mic"></lucide-icon>
+      Iniciar Gravação
+    </button>
+    <button (click)="stopRecording()" [disabled]="!isRecording">
+      <lucide-icon name="stop-circle"></lucide-icon>
+      Parar Gravação
+    </button>
+  </div>
+
+  <!-- Processing indicator -->
+  <div *ngIf="isProcessing" class="processing-indicator">
+    <lucide-icon name="loader" class="spinner"></lucide-icon>
+    Processando transcrição...
+  </div>
+
   <div class="main-content">
     <div class="content-header">
       <h2>Transcrição ao Vivo</h2>

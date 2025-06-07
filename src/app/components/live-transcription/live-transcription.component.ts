@@ -8,6 +8,7 @@ import { TranscriptionService } from '../../services/transcription.service';
 })
 export class LiveTranscriptionComponent implements OnDestroy {
   isRecording = false;
+  isProcessing = false; // Add this flag
   transcriptionText = '';
   errorMessage = '';
 
@@ -23,15 +24,10 @@ export class LiveTranscriptionComponent implements OnDestroy {
       this.audioChunks = [];
       this.errorMessage = '';
 
-      // this.mediaRecorder.ondataavailable = (event) => {
-      //   if (event.data.size > 0) {
-      //     this.audioChunks.push(event.data);
-      //   }
-      // };
-
-      this.mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
-        this.sendAudioForTranscription(audioBlob);
+      this.mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          this.audioChunks.push(event.data);
+        }
       };
 
       this.mediaRecorder.start();
@@ -43,26 +39,29 @@ export class LiveTranscriptionComponent implements OnDestroy {
 
   stopRecording() {
     if (this.mediaRecorder && this.isRecording) {
+      this.isRecording = false;
+      this.isProcessing = true; // Show processing state
+
+      // Create the audio blob and send it for transcription
+      const audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
+      this.sendAudioForTranscription(audioBlob);
+
+      // Stop the media recorder and tracks
       this.mediaRecorder.stop();
       this.mediaRecorder.stream.getTracks().forEach(track => track.stop());
-      this.isRecording = false;
-
-      this.mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          this.audioChunks.push(event.data);
-        }
-      };
+      this.audioChunks = []; // Clear chunks for next recording
     }
-
   }
 
   private sendAudioForTranscription(audioBlob: Blob) {
     this.transcriptionService.liveTranscribe(audioBlob).subscribe({
       next: (result) => {
-        this.transcriptionText = result.transcribedText; // <-- Isso está correto
+        this.transcriptionText = result.transcribedText;
+        this.isProcessing = false; // Hide processing state
       },
       error: (error) => {
         this.errorMessage = error;
+        this.isProcessing = false; // Hide processing state on error
       }
     });
   }
