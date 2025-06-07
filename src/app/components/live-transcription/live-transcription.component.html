@@ -1,21 +1,4 @@
 <div class="live-transcription-container">
-  <!-- Recording controls -->
-  <div class="controls">
-    <button (click)="startRecording()" [disabled]="isRecording || isProcessing">
-      <lucide-icon name="mic"></lucide-icon>
-      Iniciar Gravação
-    </button>
-    <button (click)="stopRecording()" [disabled]="!isRecording">
-      <lucide-icon name="stop-circle"></lucide-icon>
-      Parar Gravação
-    </button>
-  </div>
-
-  <!-- Processing indicator -->
-  <div *ngIf="isProcessing" class="processing-indicator">
-    <lucide-icon name="loader" class="spinner"></lucide-icon>
-    Processando transcrição...
-  </div>
 
   <div class="main-content">
     <div class="content-header">
@@ -25,24 +8,33 @@
 
     <div class="live-card">
       <h3>Gravação ao Vivo</h3>
-      <p class="card-subtitle">Clique no botão abaixo para começar a gravar e ver a transcrição em tempo real.</p>
+      <p class="card-subtitle">
+        {{ isProcessing ? 'Processando gravação...' : 'Clique no botão abaixo para começar a gravar e ver a transcrição em tempo real.' }}
+      </p>
 
       <div class="record-area">
         <div class="record-controls">
-          <button class="record-btn" [class.recording]="isRecording"
-            (click)="isRecording ? stopRecording() : startRecording()">
-            <lucide-icon name="mic" *ngIf="!isRecording"></lucide-icon>
-            <lucide-icon name="square" *ngIf="isRecording"></lucide-icon>
+          <button class="record-btn"
+                  [class.recording]="isRecording"
+                  [disabled]="isProcessing"
+                  (click)="isRecording ? stopRecording() : startRecording()">
+            <lucide-icon [name]="isRecording ? 'square' : 'mic'"></lucide-icon>
           </button>
 
           <p class="record-status">
-            {{ isRecording ? 'Gravando...' : 'Clique para começar a gravar' }}
+            {{ isProcessing ? 'Processando...' : (isRecording ? 'Gravando...' : 'Clique para começar a gravar') }}
           </p>
 
           <div *ngIf="isRecording" class="recording-indicator">
             <div class="pulse-dot"></div>
             <span>Ao vivo</span>
           </div>
+        </div>
+
+        <!-- Processing indicator -->
+        <div *ngIf="isProcessing" class="processing-indicator">
+          <lucide-icon name="loader" class="spinner"></lucide-icon>
+          <span>Processando transcrição...</span>
         </div>
       </div>
 
@@ -54,14 +46,16 @@
       </div>
     </div>
 
-    <!-- Mensagem de Erro -->
+    <!-- Error Message -->
     <div *ngIf="errorMessage" class="error-message">
       <lucide-icon name="alert-circle"></lucide-icon>
       {{ errorMessage }}
     </div>
 
-    <!-- Resultado da Transcrição -->
-    <div *ngIf="transcriptionText" class="result-container">
+    <!-- Transcription Result -->
+    <div *ngIf="transcriptionText"
+         class="result-container"
+         [class.processing]="isProcessing">
       <div class="result-header">
         <h3>Transcrição em Tempo Real</h3>
         <div class="result-actions">
@@ -88,7 +82,7 @@
       </div>
     </div>
 
-    <!-- Estado vazio -->
+    <!-- Empty State -->
     <div *ngIf="!transcriptionText && !isRecording && !errorMessage" class="empty-state">
       <div class="empty-icon">
         <lucide-icon name="mic"></lucide-icon>

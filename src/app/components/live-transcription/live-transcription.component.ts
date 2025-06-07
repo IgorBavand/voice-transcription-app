@@ -8,7 +8,7 @@ import { TranscriptionService } from '../../services/transcription.service';
 })
 export class LiveTranscriptionComponent implements OnDestroy {
   isRecording = false;
-  isProcessing = false; // Add this flag
+  isProcessing = false;
   transcriptionText = '';
   errorMessage = '';
 
@@ -23,12 +23,18 @@ export class LiveTranscriptionComponent implements OnDestroy {
       this.mediaRecorder = new MediaRecorder(stream);
       this.audioChunks = [];
       this.errorMessage = '';
+      this.transcriptionText = ''; // Clear previous transcription
 
-      this.mediaRecorder.ondataavailable = (event) => {
+      this.mediaRecorder.addEventListener('dataavailable', (event) => {
         if (event.data.size > 0) {
           this.audioChunks.push(event.data);
         }
-      };
+      });
+
+      this.mediaRecorder.addEventListener('stop', () => {
+        const audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
+        this.sendAudioForTranscription(audioBlob);
+      });
 
       this.mediaRecorder.start();
       this.isRecording = true;
@@ -40,16 +46,9 @@ export class LiveTranscriptionComponent implements OnDestroy {
   stopRecording() {
     if (this.mediaRecorder && this.isRecording) {
       this.isRecording = false;
-      this.isProcessing = true; // Show processing state
-
-      // Create the audio blob and send it for transcription
-      const audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
-      this.sendAudioForTranscription(audioBlob);
-
-      // Stop the media recorder and tracks
+      this.isProcessing = true;
       this.mediaRecorder.stop();
       this.mediaRecorder.stream.getTracks().forEach(track => track.stop());
-      this.audioChunks = []; // Clear chunks for next recording
     }
   }
 
@@ -57,11 +56,13 @@ export class LiveTranscriptionComponent implements OnDestroy {
     this.transcriptionService.liveTranscribe(audioBlob).subscribe({
       next: (result) => {
         this.transcriptionText = result.transcribedText;
-        this.isProcessing = false; // Hide processing state
+        this.isProcessing = false;
+        this.audioChunks = []; // Clear chunks after successful transcription
       },
       error: (error) => {
         this.errorMessage = error;
-        this.isProcessing = false; // Hide processing state on error
+        this.isProcessing = false;
+        this.audioChunks = []; // Clear chunks on error
       }
     });
   }
