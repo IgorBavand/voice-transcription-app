@@ -8,7 +8,7 @@ import { TranscriptionResponse, ErrorResponse } from '../models/Transcription';
   providedIn: 'root'
 })
 export class TranscriptionService {
-  private readonly API_URL = 'http://localhost:8787/api/transcriptions';
+  private readonly API_URL = 'https://voice-transcription-production.up.railway.app/api/transcriptions';
 
   constructor(private http: HttpClient) {}
 
