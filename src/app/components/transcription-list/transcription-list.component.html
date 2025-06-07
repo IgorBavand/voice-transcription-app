@@ -1,0 +1,88 @@
+<div class="list-container">
+  <div class="list-header">
+    <h2>Histórico de Transcrições</h2>
+    <p class="subtitle">Gerencie todas as suas transcrições</p>
+    <button class="refresh-btn" (click)="loadTranscriptions()" [disabled]="isLoading">
+      <span *ngIf="isLoading" class="spinner"></span>
+      {{ isLoading ? 'Carregando...' : '🔄 Atualizar' }}
+    </button>
+  </div>
+
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div>
+
+  <div *ngIf="isLoading && transcriptions.length === 0" class="loading-state">
+    <div class="loading-spinner"></div>
+    <p>Carregando transcrições...</p>
+  </div>
+
+  <div *ngIf="!isLoading && transcriptions.length === 0 && !errorMessage" class="empty-state">
+    <div class="empty-icon">📝</div>
+    <h3>Nenhuma transcrição encontrada</h3>
+    <p>Comece fazendo upload de um arquivo de áudio ou grave algo ao vivo!</p>
+  </div>
+
+  <div *ngIf="transcriptions.length > 0" class="transcription-list">
+    <div *ngFor="let transcription of transcriptions; trackBy: trackByTranscriptionId"
+         class="transcription-item">
+
+      <div class="transcription-header">
+        <div class="transcription-info">
+          <h3>{{ transcription.fileName }}</h3>
+          <div class="transcription-meta">
+            <span class="meta-item">
+              <strong>ID:</strong> #{{ transcription.id }}
+            </span>
+            <span class="meta-item">
+              <strong>Duração:</strong> {{ formatDuration(transcription.duration) }}
+            </span>
+            <span class="meta-item">
+              <strong>Tamanho:</strong> {{ formatFileSize(transcription.fileSize) }}
+            </span>
+            <span class="meta-item">
+              <strong>Tipo:</strong> {{ transcription.transcriptionType }}
+            </span>
+          </div>
+          <div class="transcription-details">
+            <span class="detail-item">
+              <strong>Criado em:</strong> {{ transcription.createdAt | date:'dd/MM/yyyy HH:mm:ss' }}
+            </span>
+            <span class="detail-item" *ngIf="transcription.confidence">
+              <strong>Confiança:</strong>
+              <span class="confidence-badge" [class]="getConfidenceClass(transcription.confidence)">
+                {{ (transcription.confidence * 100).toFixed(1) }}%
+              </span>
+            </span>
+            <span class="detail-item">
+              <strong>MIME:</strong> {{ transcription.mimeType }}
+            </span>
+          </div>
+        </div>
+
+        <div class="transcription-actions">
+          <button class="view-btn" (click)="toggleTranscriptionText(transcription.id)">
+            {{ isTextVisible(transcription.id) ? '👁️ Ocultar' : '👁️ Ver Texto' }}
+          </button>
+          <button class="copy-btn" (click)="copyTranscriptionText(transcription.transcribedText)">
+            📋 Copiar
+          </button>
+          <button class="delete-btn" (click)="deleteTranscription(transcription.id)">
+            🗑️ Excluir
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="isTextVisible(transcription.id)" class="transcription-text" [@slideDown]>
+        <h4>Texto Transcrito:</h4>
+        <div class="text-content">
+          <p>{{ transcription.transcribedText }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="transcriptions.length > 0" class="list-summary">
+    <p>Total: {{ transcriptions.length }} transcrição(ões)</p>
+  </div>
+</div>

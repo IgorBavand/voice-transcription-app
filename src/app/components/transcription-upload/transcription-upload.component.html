@@ -1,0 +1,50 @@
+<div class="upload-container">
+  <div class="upload-card">
+    <h2>Transcrever Áudio</h2>
+
+    <div class="file-input-container">
+      <input
+        type="file"
+        id="audioFile"
+        accept="audio/*"
+        (change)="onFileSelect($event)"
+        #fileInput>
+      <label for="audioFile" class="file-input-label">
+        <i class="icon-upload"></i>
+        {{ selectedFile ? selectedFile.name : 'Escolher arquivo de áudio' }}
+      </label>
+    </div>
+
+    <div *ngIf="selectedFile" class="file-info">
+      <p><strong>Arquivo:</strong> {{ selectedFile.name }}</p>
+      <p><strong>Tamanho:</strong> {{ formatFileSize(selectedFile.size) }}</p>
+      <p><strong>Tipo:</strong> {{ selectedFile.type }}</p>
+    </div>
+
+    <button
+      class="upload-btn"
+      [disabled]="!selectedFile || isUploading"
+      (click)="onUpload()">
+      <span *ngIf="isUploading" class="spinner"></span>
+      {{ isUploading ? 'Transcrevendo...' : 'Transcrever' }}
+    </button>
+
+    <div *ngIf="errorMessage" class="error-message">
+      {{ errorMessage }}
+    </div>
+
+    <div *ngIf="uploadResult" class="result-container">
+      <h3>Resultado da Transcrição</h3>
+      <div class="result-info">
+        <p><strong>ID:</strong> {{ uploadResult.id }}</p>
+        <p><strong>Duração:</strong> {{ formatDuration(uploadResult.duration) }}</p>
+        <p><strong>Confiança:</strong> {{ uploadResult.confidence ? (uploadResult.confidence * 100).toFixed(1) + '%' : 'N/A' }}</p>
+        <p><strong>Data:</strong> {{ uploadResult.createdAt | date:'dd/MM/yyyy HH:mm' }}</p>
+      </div>
+      <div class="transcribed-text">
+        <h4>Texto Transcrito:</h4>
+        <p>{{ uploadResult.transcribedText }}</p>
+      </div>
+    </div>
+  </div>
+</div>

@@ -6,5 +6,10 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'voice-transcription-app';
+  title = 'Voice Transcribe';
+  activeTab = 'upload';
+
+  setActiveTab(tab: string) {
+    this.activeTab = tab;
+  }
 }

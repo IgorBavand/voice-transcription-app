@@ -1,0 +1,58 @@
+@import 'colors';
+
+.app-container {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: $background-color;
+  color: $text-color;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  background-color: $primary-purple;
+  color: $white;
+  padding: 1rem 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  h1 {
+    margin: 0;
+    font-size: 1.8rem;
+  }
+
+  .nav-tabs {
+    margin-top: 1rem;
+    display: flex;
+    gap: 1rem;
+
+    button {
+      background-color: transparent;
+      border: 2px solid transparent;
+      color: $white;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background-color: $hover-purple;
+        border-color: $light-purple;
+      }
+
+      &.active {
+        background-color: $white;
+        color: $primary-purple;
+        border-color: $primary-purple;
+      }
+    }
+  }
+}
+
+.app-main {
+  flex: 1;
+  padding: 2rem;
+  background-color: $white;
+  border-top-left-radius: 1.5rem;
+  border-top-right-radius: 1.5rem;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+}
