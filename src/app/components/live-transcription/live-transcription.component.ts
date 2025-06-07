@@ -23,11 +23,11 @@ export class LiveTranscriptionComponent implements OnDestroy {
       this.audioChunks = [];
       this.errorMessage = '';
 
-      this.mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          this.audioChunks.push(event.data);
-        }
-      };
+      // this.mediaRecorder.ondataavailable = (event) => {
+      //   if (event.data.size > 0) {
+      //     this.audioChunks.push(event.data);
+      //   }
+      // };
 
       this.mediaRecorder.onstop = () => {
         const audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
@@ -46,7 +46,14 @@ export class LiveTranscriptionComponent implements OnDestroy {
       this.mediaRecorder.stop();
       this.mediaRecorder.stream.getTracks().forEach(track => track.stop());
       this.isRecording = false;
+
+      this.mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          this.audioChunks.push(event.data);
+        }
+      };
     }
+
   }
 
   private sendAudioForTranscription(audioBlob: Blob) {
