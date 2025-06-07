@@ -25,7 +25,7 @@ export class TranscriptionListComponent implements OnInit {
   errorMessage = '';
   visibleTranscriptionIds: Set<number> = new Set();
 
-  constructor(private transcriptionService: TranscriptionService) {}
+  constructor(private transcriptionService: TranscriptionService) { }
 
   ngOnInit() {
     this.loadTranscriptions();
@@ -61,11 +61,14 @@ export class TranscriptionListComponent implements OnInit {
   }
 
   toggleTranscriptionText(id: number) {
-    if (this.visibleTranscriptionIds.has(id)) {
-      this.visibleTranscriptionIds.delete(id);
+    const newSet = new Set(this.visibleTranscriptionIds);
+    console.log(id)
+    if (newSet.has(id)) {
+      newSet.delete(id);
     } else {
-      this.visibleTranscriptionIds.add(id);
+      newSet.add(id);
     }
+    this.visibleTranscriptionIds = newSet; // Atribui a nova instância
   }
 
   isTextVisible(id: number): boolean {

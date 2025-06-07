@@ -7,7 +7,7 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'Voice Transcribe';
-  activeTab = 'upload';
+  activeTab: string = 'live'; // Começar com a aba de gravação
 
   setActiveTab(tab: string) {
     this.activeTab = tab;

@@ -1,1 +1,82 @@
-<p>live-transcription works!</p>
+<div class="live-transcription-container">
+  <div class="main-content">
+    <div class="content-header">
+      <h2>Transcrição ao Vivo</h2>
+      <p class="subtitle">Grave e transcreva áudio em tempo real</p>
+    </div>
+
+    <div class="live-card">
+      <h3>Gravação ao Vivo</h3>
+      <p class="card-subtitle">Clique no botão abaixo para começar a gravar e ver a transcrição em tempo real.</p>
+
+      <div class="record-area">
+        <div class="record-controls">
+          <button class="record-btn" [class.recording]="isRecording"
+            (click)="isRecording ? stopRecording() : startRecording()">
+            <lucide-icon name="mic" *ngIf="!isRecording"></lucide-icon>
+            <lucide-icon name="square" *ngIf="isRecording"></lucide-icon>
+          </button>
+
+          <p class="record-status">
+            {{ isRecording ? 'Gravando...' : 'Clique para começar a gravar' }}
+          </p>
+
+          <div *ngIf="isRecording" class="recording-indicator">
+            <div class="pulse-dot"></div>
+            <span>Ao vivo</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls-section">
+        <button class="action-button secondary" (click)="clearTranscription()" [disabled]="!transcriptionText">
+          <lucide-icon name="trash-2"></lucide-icon>
+          Limpar Texto
+        </button>
+      </div>
+    </div>
+
+    <!-- Mensagem de Erro -->
+    <div *ngIf="errorMessage" class="error-message">
+      <lucide-icon name="alert-circle"></lucide-icon>
+      {{ errorMessage }}
+    </div>
+
+    <!-- Resultado da Transcrição -->
+    <div *ngIf="transcriptionText" class="result-container">
+      <div class="result-header">
+        <h3>Transcrição em Tempo Real</h3>
+        <div class="result-actions">
+          <button class="action-btn" (click)="copyToClipboard()">
+            <lucide-icon name="copy"></lucide-icon>
+            Copiar
+          </button>
+          <button class="action-btn" (click)="downloadText()">
+            <lucide-icon name="download"></lucide-icon>
+            Baixar
+          </button>
+        </div>
+      </div>
+
+      <div class="transcription-display">
+        <div class="text-content">
+          <p>{{ transcriptionText }}</p>
+        </div>
+
+        <div class="text-stats">
+          <span>{{ getWordCount(transcriptionText) }} palavras</span>
+          <span>{{ transcriptionText.length }} caracteres</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Estado vazio -->
+    <div *ngIf="!transcriptionText && !isRecording && !errorMessage" class="empty-state">
+      <div class="empty-icon">
+        <lucide-icon name="mic"></lucide-icon>
+      </div>
+      <h3>Pronto para transcrever</h3>
+      <p>Clique no botão de gravação para começar a transcrição ao vivo</p>
+    </div>
+  </div>
+</div>

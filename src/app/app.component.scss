@@ -1,48 +1,59 @@
 @import 'colors';
 
 .app-container {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: $background-color;
-  color: $text-color;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #1a1f2e;
+  color: #ffffff;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
 .app-header {
-  background-color: $primary-purple;
-  color: $white;
-  padding: 1rem 2rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background: #1a1f2e;
+  padding: 16px 24px;
+  border-bottom: 1px solid #2a3441;
 
-  h1 {
-    margin: 0;
-    font-size: 1.8rem;
-  }
-
-  .nav-tabs {
-    margin-top: 1rem;
+  .header-content {
+    max-width: 1200px;
+    margin: 0 auto;
     display: flex;
-    gap: 1rem;
+    justify-content: space-between;
+    align-items: center;
 
-    button {
-      background-color: transparent;
-      border: 2px solid transparent;
-      color: $white;
-      padding: 0.5rem 1rem;
-      border-radius: 8px;
-      font-weight: 500;
-      transition: all 0.3s ease;
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 0;
+      color: #ffffff;
+    }
 
-      &:hover {
-        background-color: $hover-purple;
-        border-color: $light-purple;
-      }
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
 
-      &.active {
-        background-color: $white;
-        color: $primary-purple;
-        border-color: $primary-purple;
+      button {
+        background: transparent;
+        border: 1px solid #3a4553;
+        color: #8b9aa8;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background: #2a3441;
+          color: #ffffff;
+          border-color: #4a5563;
+        }
+
+        &.active {
+          background: #ffffff;
+          color: #1a1f2e;
+          border-color: #ffffff;
+        }
       }
     }
   }
@@ -50,9 +61,18 @@
 
 .app-main {
   flex: 1;
-  padding: 2rem;
-  background-color: $white;
-  border-top-left-radius: 1.5rem;
-  border-top-right-radius: 1.5rem;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+  background-color: #1a1f2e;
+}
+
+@media (max-width: 768px) {
+  .app-header .header-content {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .app-header .nav-tabs {
+    width: 100%;
+    justify-content: flex-start;
+  }
 }

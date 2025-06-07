@@ -1,34 +1,24 @@
 <div class="app-container">
   <header class="app-header">
-    <h1>{{ title }}</h1>
-    <nav class="nav-tabs">
-      <button
-        [class.active]="activeTab === 'upload'"
-        (click)="setActiveTab('upload')">
-        Upload
-      </button>
-      <button
-        [class.active]="activeTab === 'live'"
-        (click)="setActiveTab('live')">
-        Ao Vivo
-      </button>
-      <button
-        [class.active]="activeTab === 'list'"
-        (click)="setActiveTab('list')">
-        Histórico
-      </button>
-      <button
-        [class.active]="activeTab === 'search'"
-        (click)="setActiveTab('search')">
-        Buscar
-      </button>
-    </nav>
+    <div class="header-content">
+      <h1>Voice Transcribe</h1>
+      <nav class="nav-tabs">
+        <button [class.active]="activeTab === 'live'" (click)="setActiveTab('live')">
+          Gravar
+        </button>
+        <button [class.active]="activeTab === 'upload'" (click)="setActiveTab('upload')">
+          Upload
+        </button>
+        <button [class.active]="activeTab === 'list'" (click)="setActiveTab('list')">
+          Histórico
+        </button>
+      </nav>
+    </div>
   </header>
 
   <main class="app-main">
-    <app-transcription-upload *ngIf="activeTab === 'upload'"></app-transcription-upload>
     <app-live-transcription *ngIf="activeTab === 'live'"></app-live-transcription>
+    <app-transcription-upload *ngIf="activeTab === 'upload'"></app-transcription-upload>
     <app-transcription-list *ngIf="activeTab === 'list'"></app-transcription-list>
-    <app-transcription-search *ngIf="activeTab === 'search'"></app-transcription-search>
   </main>
 </div>
