@@ -19,30 +19,36 @@
 }
 
 .confidence-badge {
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 0.9em;
+  padding: 3px 10px; // Ajustado padding
+  border-radius: 16px; // Mais arredondado
+  font-size: 0.8rem; // Menor
+  font-weight: 500;
+  display: inline-block; // Para que o margin-top funcione bem
+  margin-top: 8px;
 
   &.high-confidence {
-    background-color: #4caf50;
-    color: white;
+    background-color: rgba(76, 175, 80, 0.2); // Fundo mais suave
+    color: #66bb6a; // Cor do texto correspondente
+    border: 1px solid #4caf50;
   }
 
   &.medium-confidence {
-    background-color: #ff9800;
-    color: white;
+    background-color: rgba(255, 152, 0, 0.2);
+    color: #ffa726;
+    border: 1px solid #ff9800;
   }
 
   &.low-confidence {
-    background-color: #f44336;
-    color: white;
+    background-color: rgba(244, 67, 54, 0.2);
+    color: #ef5350;
+    border: 1px solid #f44336;
   }
 }
 
 .transcription-item {
   background: white;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   margin-bottom: 16px;
   padding: 16px;
 }
@@ -104,16 +110,459 @@
   }
 }
 
-.loading-spinner {
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #3498db;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  animation: spin 1s linear infinite;
+.transcription-list-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1a1f2e 0%, #2a3042 100%);
+  padding: 20px;
+
+  .main-content {
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center; // Mantém a centralização dos filhos diretos como .history-list
+    justify-content: flex-start;
+    padding: 40px 20px;
+    gap: 30px;
+  }
+
+  .content-header {
+    text-align: center;
+    background: #232b38;
+    border-radius: 20px;
+    padding: 50px 40px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    // margin-bottom: 30px; // Removido, usar gap no main-content
+
+    .header-icon {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0 auto 30px auto; // Centralizado com margin auto
+      width: 100px; // Aumentado ligeiramente
+      height: 100px; // Aumentado ligeiramente
+      background: rgba(77, 132, 255, 0.15); // Aumentado opacidade
+      border-radius: 50%;
+
+      lucide-icon {
+        width: 65px !important; // Aumentado
+        height: 65px !important; // Aumentado
+        color: #4d84ff;
+      }
+    }
+
+    h2 {
+      font-size: 2.4rem; // Aumentado
+      font-weight: 700;
+      margin: 0 0 16px 0; // Aumentado margin bottom
+      color: #ffffff;
+      letter-spacing: -0.02em;
+      text-align: center; // Garantido centralização
+    }
+
+    .subtitle {
+      font-size: 1.15rem; // Ligeiramente aumentado
+      color: #a0aec0;
+      margin: 0 0 40px 0; // Aumentado margin bottom
+      text-align: center; // Garantido centralização
+      line-height: 1.4; // Adicionado
+    }
+
+    .refresh-btn {
+      background: #4d84ff;
+      border: none;
+      color: #ffffff;
+      border-radius: 12px; // Aumentado
+      padding: 16px 40px; // Aumentado
+      font-size: 1.1rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center; // Adicionado
+      gap: 12px; // Aumentado
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(77, 132, 255, 0.3);
+      margin: 0 auto; // Garantido centralização
+
+      &:hover:not(:disabled) {
+        background: #3a6cdb;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(77, 132, 255, 0.4);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+
+      &:disabled {
+        background: #3a4553;
+        opacity: 0.7;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      lucide-icon {
+        width: 24px !important; // Ligeiramente aumentado
+        height: 24px !important; // Ligeiramente aumentado
+      }
+    }
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #8b9aa8;
+    width: 100%;
+    max-width: 500px; // Limitado largura máxima
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; // Adicionado
+    margin: 0 auto; // Garantido centralização
+
+    .empty-icon {
+      margin: 0 auto 24px auto; // Centralizado com margin auto
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 120px; // Aumentado
+      height: 120px; // Aumentado
+      background: rgba(90, 101, 115, 0.1);
+      border-radius: 50%;
+
+      lucide-icon {
+        width: 90px; // Aumentado
+        height: 90px; // Aumentado
+        color: #5a6573;
+      }
+    }
+
+    h3 {
+      font-size: 1.6rem; // Aumentado
+      font-weight: 600;
+      margin: 0 0 16px 0; // Aumentado margin
+      color: #ffffff;
+      text-align: center;
+    }
+
+    p {
+      font-size: 1.05rem; // Ligeiramente aumentado
+      margin: 0;
+      max-width: 400px;
+      text-align: center;
+      line-height: 1.5; // Adicionado
+    }
+  }
+
+  .history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%; // Ocupa a largura do .main-content
+    // align-items: center; // Pode ser removido se usarmos margin auto no filho
+  }
+
+  .history-item {
+    background: #232b38;
+    border-radius: 12px;
+    padding: 28px; // Aumentado o padding geral
+    display: flex;
+    flex-direction: column;
+    gap: 20px; // Aumentado o gap entre seções
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 650px;
+    margin-left: auto;
+    margin-right: auto;
+
+    .history-info {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px; // Aumentado o gap entre ícone e texto
+
+      lucide-icon {
+        width: 32px; // Aumentado o ícone
+        height: 32px; // Aumentado o ícone
+        color: #8b9aa8;
+        flex-shrink: 0;
+        margin-top: 4px; // Ajustado para melhor alinhamento
+      }
+
+      div {
+        display: flex;
+        flex-direction: column;
+        gap: 8px; // Aumentado o gap entre título e meta
+        flex: 1; // Faz o texto ocupar o espaço disponível
+      }
+
+      .history-title {
+        font-weight: 600;
+        color: #e0e6f0;
+        font-size: 1.2rem; // Ligeiramente aumentado
+        line-height: 1.4;
+        margin: 0; // Garantido margin zero
+      }
+
+      .history-date {
+        font-size: 0.9rem; // Ligeiramente aumentado
+        color: #7a889c;
+        margin: 0; // Garantido margin zero
+        line-height: 1.3;
+      }
+
+      .confidence-badge {
+        margin-top: 4px; // Reduzido para ficar mais próximo do texto
+        align-self: flex-start; // Alinha à esquerda
+      }
+    }
+
+    .history-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px; // Aumentado o gap entre botões
+      margin-top: 16px; // Aumentado margin top
+      justify-content: flex-start; // Alinha à esquerda
+
+      .action-btn {
+        background: #3a4553;
+        border: 1px solid #4a5563;
+        color: #cdd5e0;
+        border-radius: 10px; // Ligeiramente mais arredondado
+        padding: 12px 20px; // Aumentado o padding
+        font-size: 0.95rem; // Ligeiramente aumentado
+        font-weight: 500; // Adicionado peso à fonte
+        cursor: pointer;
+        display: flex;
+        align-items: center; // IMPORTANTE: Centraliza verticalmente ícone e texto
+        justify-content: center; // Centraliza conteúdo do botão
+        gap: 8px; // Aumentado o gap entre ícone e texto
+        transition: all 0.2s ease;
+        min-width: 110px; // Largura mínima para consistência
+        white-space: nowrap; // Evita quebra de linha no texto do botão
+        line-height: 1; // ADICIONADO: Remove altura extra da linha
+
+        &:hover {
+          background: #4a5563;
+          border-color: #5a6573;
+          transform: translateY(-1px); // Leve efeito de elevação
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        &:active {
+          transform: translateY(0); // Remove elevação ao clicar
+        }
+
+        &.delete {
+          background-color: #58282d;
+          border-color: #7c3c43;
+          color: #ff8a8a;
+
+          &:hover {
+            background-color: #7c3c43;
+            border-color: #9e5059;
+            color: #ffffff;
+          }
+        }
+
+        lucide-icon {
+          width: 18px; // Ligeiramente aumentado
+          height: 18px; // Ligeiramente aumentado
+          color: currentColor;
+          flex-shrink: 0; // Evita que o ícone encolha
+          display: flex; // ADICIONADO: Garante que o ícone seja um flex container
+          align-items: center; // ADICIONADO: Centraliza o SVG dentro do lucide-icon
+          justify-content: center; // ADICIONADO: Centraliza o SVG dentro do lucide-icon
+        }
+      }
+    }
+
+    .transcription-text-content {
+      background-color: #1a1f2e;
+      padding: 20px; // Aumentado o padding
+      border-radius: 10px; // Mais arredondado
+      margin-top: 12px; // Aumentado margin top
+      border: 1px solid #3a4553;
+      color: #cdd5e0;
+      white-space: pre-wrap;
+      font-size: 1rem; // Ligeiramente aumentado
+      line-height: 1.7; // Aumentado para melhor legibilidade
+      max-height: 400px; // Limitado altura máxima
+      overflow-y: auto; // Scroll se necessário
+
+      // Estilo personalizado para scrollbar
+      &::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: #2a3042;
+        border-radius: 3px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: #4a5563;
+        border-radius: 3px;
+
+        &:hover {
+          background: #5a6573;
+        }
+      }
+    }
+  }
+
+  // Ajuste no confidence-badge para melhor integração
+  .confidence-badge {
+    padding: 4px 12px; // Aumentado padding
+    border-radius: 18px; // Mais arredondado
+    font-size: 0.85rem; // Ligeiramente aumentado
+    font-weight: 500;
+    display: inline-block;
+    margin-top: 8px;
+
+    &.high-confidence {
+      background-color: rgba(76, 175, 80, 0.2);
+      color: #66bb6a;
+      border: 1px solid #4caf50;
+    }
+
+    &.medium-confidence {
+      background-color: rgba(255, 152, 0, 0.2);
+      color: #ffa726;
+      border: 1px solid #ff9800;
+    }
+
+    &.low-confidence {
+      background-color: rgba(244, 67, 54, 0.2);
+      color: #ef5350;
+      border: 1px solid #f44336;
+    }
+  }
+
+  .list-summary {
+    text-align: right;
+    color: #8b9aa8;
+    font-size: 1rem;
+    margin-top: 24px;
+  }
+
+  .error-message {
+    background: rgba(255, 68, 68, 0.1);
+    border: 1px solid #ff4444;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 24px auto; // Centralizado
+    display: flex;
+    align-items: center;
+    justify-content: center; // Adicionado
+    gap: 12px;
+    color: #ff6b6b;
+    max-width: 500px; // Limitado largura
+
+    lucide-icon {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+  }
+
+  .loading-state {
+    text-align: center;
+    padding: 40px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    .loading-spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #3498db;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px auto;
+    }
+
+    p {
+      color: #8b9aa8;
+      text-align: center;
+    }
+  }
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+// Media query atualizada para responsividade
+@media (max-width: 768px) {
+  .transcription-list-container .main-content {
+    padding: 16px;
+    gap: 24px; // Reduzido gap para mobile
+  }
+
+  .history-item {
+    padding: 20px !important; // Reduzido padding para mobile
+    gap: 16px !important; // Reduzido gap para mobile
+
+    .history-info {
+      gap: 16px !important; // Reduzido gap para mobile
+
+      lucide-icon {
+        width: 28px !important;
+        height: 28px !important;
+      }
+
+      .history-title {
+        font-size: 1.1rem !important;
+      }
+
+      .history-date {
+        font-size: 0.85rem !important;
+      }
+    }
+
+    .history-actions {
+      gap: 12px !important; // Reduzido gap para mobile
+
+      .action-btn {
+        padding: 10px 16px !important; // Reduzido padding para mobile
+        font-size: 0.9rem !important;
+        min-width: 100px !important; // Reduzido largura mínima para mobile
+        line-height: 1 !important; // MANTÉM line-height em mobile
+
+        lucide-icon {
+          width: 16px !important;
+          height: 16px !important;
+          display: flex !important; // MANTÉM display flex em mobile
+          align-items: center !important; // MANTÉM alinhamento em mobile
+          justify-content: center !important; // MANTÉM centralização em mobile
+        }
+      }
+    }
+
+    .transcription-text-content {
+      padding: 16px !important; // Reduzido padding para mobile
+      font-size: 0.95rem !important;
+      max-height: 300px !important; // Reduzido altura máxima para mobile
+    }
+  }
 }

@@ -8,12 +8,16 @@ import { TranscriptionResponse } from '../../models/Transcription';
   styleUrls: ['./transcription-upload.component.scss']
 })
 export class TranscriptionUploadComponent {
+  activeTab: 'record' | 'upload' = 'upload';
   selectedFile: File | null = null;
   isUploading = false;
-  uploadResult: TranscriptionResponse | null = null;
+  isRecording = false;
+  recordingDuration = 0;
+  isDragOver = false;
   errorMessage = '';
+  uploadResult: TranscriptionResponse | null = null;
 
-  constructor(private transcriptionService: TranscriptionService) {}
+  constructor(private transcriptionService: TranscriptionService) { }
 
   onFileSelect(event: any) {
     const file = event.target.files[0];
@@ -24,6 +28,36 @@ export class TranscriptionUploadComponent {
       this.errorMessage = 'Por favor, selecione um arquivo de áudio válido (.wav, .mp3, .flac, .ogg)';
       this.selectedFile = null;
     }
+  }
+
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+    this.isDragOver = true;
+  }
+
+  onDragLeave(event: DragEvent) {
+    event.preventDefault();
+    this.isDragOver = false;
+  }
+
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    this.isDragOver = false;
+
+    const files = event.dataTransfer?.files;
+    if (files && files.length > 0) {
+      this.selectedFile = files[0];
+      this.errorMessage = '';
+    }
+  }
+
+  removeFile() {
+    this.selectedFile = null;
+  }
+
+  toggleRecording() {
+    this.isRecording = !this.isRecording;
+    // Implementar lógica de gravação
   }
 
   onUpload() {
@@ -45,6 +79,24 @@ export class TranscriptionUploadComponent {
     });
   }
 
+  copyToClipboard() {
+    if (this.uploadResult?.transcribedText) {
+      navigator.clipboard.writeText(this.uploadResult.transcribedText);
+    }
+  }
+
+  downloadText() {
+    if (this.uploadResult?.transcribedText) {
+      const blob = new Blob([this.uploadResult.transcribedText], { type: 'text/plain' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'transcription.txt';
+      a.click();
+      window.URL.revokeObjectURL(url);
+    }
+  }
+
   private isAudioFile(file: File): boolean {
     return file.type.startsWith('audio/');
   }
@@ -59,7 +111,11 @@ export class TranscriptionUploadComponent {
 
   formatDuration(seconds: number): string {
     const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
+    const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
+  }
+
+  getWordCount(text: string): number {
+    return text ? text.trim().split(/\s+/).length : 0;
   }
 }

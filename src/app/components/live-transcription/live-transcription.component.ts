@@ -14,7 +14,7 @@ export class LiveTranscriptionComponent implements OnDestroy {
   private mediaRecorder: MediaRecorder | null = null;
   private audioChunks: Blob[] = [];
 
-  constructor(private transcriptionService: TranscriptionService) {}
+  constructor(private transcriptionService: TranscriptionService) { }
 
   async startRecording() {
     try {
@@ -52,7 +52,7 @@ export class LiveTranscriptionComponent implements OnDestroy {
   private sendAudioForTranscription(audioBlob: Blob) {
     this.transcriptionService.liveTranscribe(audioBlob).subscribe({
       next: (result) => {
-        this.transcriptionText = result.transcribedText;
+        this.transcriptionText = result.transcribedText; // <-- Isso está correto
       },
       error: (error) => {
         this.errorMessage = error;
@@ -65,7 +65,31 @@ export class LiveTranscriptionComponent implements OnDestroy {
     this.errorMessage = '';
   }
 
+  copyToClipboard() {
+    if (this.transcriptionText) {
+      navigator.clipboard.writeText(this.transcriptionText);
+    }
+  }
+
+  downloadText() {
+    if (this.transcriptionText) {
+      const blob = new Blob([this.transcriptionText], { type: 'text/plain' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'live-transcription.txt';
+      a.click();
+      window.URL.revokeObjectURL(url);
+    }
+  }
+
+  getWordCount(text: string): number {
+    return text ? text.trim().split(/\s+/).length : 0;
+  }
+
   ngOnDestroy() {
-    this.stopRecording();
+    if (this.isRecording) {
+      this.stopRecording();
+    }
   }
 }

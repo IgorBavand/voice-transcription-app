@@ -1,88 +1,72 @@
-<div class="list-container">
-  <div class="list-header">
-    <h2>Histórico de Transcrições</h2>
-    <p class="subtitle">Gerencie todas as suas transcrições</p>
-    <button class="refresh-btn" (click)="loadTranscriptions()" [disabled]="isLoading">
-      <span *ngIf="isLoading" class="spinner"></span>
-      {{ isLoading ? 'Carregando...' : '🔄 Atualizar' }}
-    </button>
-  </div>
-
-  <div *ngIf="errorMessage" class="error-message">
-    {{ errorMessage }}
-  </div>
-
-  <div *ngIf="isLoading && transcriptions.length === 0" class="loading-state">
-    <div class="loading-spinner"></div>
-    <p>Carregando transcrições...</p>
-  </div>
-
-  <div *ngIf="!isLoading && transcriptions.length === 0 && !errorMessage" class="empty-state">
-    <div class="empty-icon">📝</div>
-    <h3>Nenhuma transcrição encontrada</h3>
-    <p>Comece fazendo upload de um arquivo de áudio ou grave algo ao vivo!</p>
-  </div>
-
-  <div *ngIf="transcriptions.length > 0" class="transcription-list">
-    <div *ngFor="let transcription of transcriptions; trackBy: trackByTranscriptionId"
-         class="transcription-item">
-
-      <div class="transcription-header">
-        <div class="transcription-info">
-          <h3>{{ transcription.fileName }}</h3>
-          <div class="transcription-meta">
-            <span class="meta-item">
-              <strong>ID:</strong> #{{ transcription.id }}
-            </span>
-            <span class="meta-item">
-              <strong>Duração:</strong> {{ formatDuration(transcription.duration) }}
-            </span>
-            <span class="meta-item">
-              <strong>Tamanho:</strong> {{ formatFileSize(transcription.fileSize) }}
-            </span>
-            <span class="meta-item">
-              <strong>Tipo:</strong> {{ transcription.transcriptionType }}
-            </span>
-          </div>
-          <div class="transcription-details">
-            <span class="detail-item">
-              <strong>Criado em:</strong> {{ transcription.createdAt | date:'dd/MM/yyyy HH:mm:ss' }}
-            </span>
-            <span class="detail-item" *ngIf="transcription.confidence">
-              <strong>Confiança:</strong>
-              <span class="confidence-badge" [class]="getConfidenceClass(transcription.confidence)">
-                {{ (transcription.confidence * 100).toFixed(1) }}%
-              </span>
-            </span>
-            <span class="detail-item">
-              <strong>MIME:</strong> {{ transcription.mimeType }}
-            </span>
-          </div>
-        </div>
-
-        <div class="transcription-actions">
-          <button class="view-btn" (click)="toggleTranscriptionText(transcription.id)">
-            {{ isTextVisible(transcription.id) ? '👁️ Ocultar' : '👁️ Ver Texto' }}
-          </button>
-          <button class="copy-btn" (click)="copyTranscriptionText(transcription.transcribedText)">
-            📋 Copiar
-          </button>
-          <button class="delete-btn" (click)="deleteTranscription(transcription.id)">
-            🗑️ Excluir
-          </button>
-        </div>
+<div class="transcription-list-container">
+  <div class="main-content">
+    <div *ngIf="transcriptions.length === 0 && !isLoading && !errorMessage" class="content-header">
+      <div class="header-icon">
+        <lucide-icon name="clock"></lucide-icon>
       </div>
+      <h2>Histórico de Transcrições</h2>
+      <p class="subtitle">Suas transcrições anteriores aparecerão aqui</p>
+      <button class="refresh-btn" (click)="loadTranscriptions()" [disabled]="isLoading">
+        <lucide-icon name="refresh"></lucide-icon>
+        Atualizar
+      </button>
+    </div>
 
-      <div *ngIf="isTextVisible(transcription.id)" class="transcription-text" [@slideDown]>
-        <h4>Texto Transcrito:</h4>
-        <div class="text-content">
+    <div *ngIf="isLoading" class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Carregando transcrições...</p>
+    </div>
+
+    <div *ngIf="!isLoading && errorMessage" class="error-message">
+      <lucide-icon name="alert-circle"></lucide-icon>
+      <span>{{ errorMessage }}</span>
+    </div>
+
+    <div *ngIf="!isLoading && !errorMessage && transcriptions.length === 0" class="empty-state">
+      <div class="empty-icon">
+        <lucide-icon name="file-text"></lucide-icon>
+      </div>
+      <h3>Nenhuma transcrição encontrada</h3>
+      <p>Suas transcrições aparecerão aqui quando você criar uma nova.</p>
+    </div>
+
+    <div *ngIf="transcriptions.length > 0" class="history-list">
+      <div *ngFor="let transcription of transcriptions; trackBy: trackByTranscriptionId" class="history-item">
+        <div class="history-info">
+          <lucide-icon name="file-text"></lucide-icon>
+          <div>
+            <p class="history-title">{{ transcription.fileName || 'Transcrição' }}</p>
+            <p class="history-date">
+              {{ transcription.createdAt | date:'dd/MM/yyyy HH:mm' }} |
+              Duração: {{ formatDuration(transcription.duration) }} |
+              Tamanho: {{ formatFileSize(transcription.fileSize) }}
+            </p>
+            <span *ngIf="transcription.confidence !== null && transcription.confidence !== undefined"
+              class="confidence-badge" [ngClass]="getConfidenceClass(transcription.confidence)">
+              Confiança: {{ (transcription.confidence * 100).toFixed(0) }}%
+            </span>
+          </div>
+        </div>
+
+        <div class="history-actions">
+          <button class="action-btn" (click)="toggleTranscriptionText(transcription.id)">
+            <lucide-icon [name]="isTextVisible(transcription.id) ? 'eye-off' : 'eye'"></lucide-icon>
+            {{ isTextVisible(transcription.id) ? 'Ocultar' : 'Ver Texto' }}
+          </button>
+          <button class="action-btn" (click)="copyTranscriptionText(transcription.transcribedText)">
+            <lucide-icon name="copy"></lucide-icon>
+            Copiar
+          </button>
+          <button class="action-btn delete" (click)="deleteTranscription(transcription.id)">
+            <lucide-icon name="trash-2"></lucide-icon>
+            Deletar
+          </button>
+        </div>
+
+        <div *ngIf="isTextVisible(transcription.id)" class="transcription-text-content" @slideDown>
           <p>{{ transcription.transcribedText }}</p>
         </div>
       </div>
     </div>
-  </div>
-
-  <div *ngIf="transcriptions.length > 0" class="list-summary">
-    <p>Total: {{ transcriptions.length }} transcrição(ões)</p>
   </div>
 </div>
