@@ -12,7 +12,6 @@ export class LiveTranscriptionComponent implements OnDestroy {
   isProcessing = false;
   transcriptionText = '';
   errorMessage = '';
-  // audioBlob: Blob | null = null;
 
   sessionId: string = '';
 
@@ -94,7 +93,6 @@ export class LiveTranscriptionComponent implements OnDestroy {
 
   clearTranscription() {
     this.transcriptionText = '';
-    // this.audioBlob = null;
     this.errorMessage = '';
   }
 

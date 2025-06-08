@@ -8,7 +8,7 @@ export class AudioRecorderService {
   private mediaRecorder: MediaRecorder | null = null;
   private audioChunks: Blob[] = [];
   private isRecording = false;
-  private apiUrl = 'http://localhost:8787/audio';
+  private apiUrl = 'https://voice-transcription-production.up.railway.app/audio';
 
   constructor(private http: HttpClient) {}
 
@@ -25,7 +25,7 @@ export class AudioRecorderService {
       }
     };
 
-    this.mediaRecorder.start(2000); // 2 segundos por churck
+    this.mediaRecorder.start(2000);
   }
 
   stopRecording(sessionId: string): Observable<any> {
@@ -44,14 +44,12 @@ export class AudioRecorderService {
     const formData = new FormData();
     formData.append('audio', blob, 'chunk.webm');
     formData.append('sessionId', sessionId);
-    // Tenta enviar, se falhar salva no storage
     this.http.post(`${this.apiUrl}/stream`, formData).subscribe({
       error: () => this.saveChunkOffline(blob)
     });
   }
 
   private saveChunkOffline(blob: Blob) {
-    // Simples: salva em localStorage (ideal: IndexedDB)
     const key = `audio_chunk_${Date.now()}`;
     blob.arrayBuffer().then(buffer => {
       const base64 = btoa(String.fromCharCode(...new Uint8Array(buffer)));
