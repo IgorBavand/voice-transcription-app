@@ -1,5 +1,6 @@
 import { Component, OnDestroy } from '@angular/core';
-import { TranscriptionService } from '../../services/transcription.service';
+import { AudioRecorderService } from '../../services/audio-recorder.service';
+import {v4 as uuidv4} from 'uuid';
 
 @Component({
   selector: 'app-live-transcription',
@@ -11,87 +12,90 @@ export class LiveTranscriptionComponent implements OnDestroy {
   isProcessing = false;
   transcriptionText = '';
   errorMessage = '';
+  // audioBlob: Blob | null = null;
 
-  private mediaRecorder: MediaRecorder | null = null;
-  private audioChunks: Blob[] = [];
+  sessionId: string = '';
 
-  constructor(private transcriptionService: TranscriptionService) { }
+  ngOnInit () {
+    console.log('gerand o sessionId');
+    this.sessionId = uuidv4();
+  }
+
+  constructor(private audioRecorderService: AudioRecorderService) {}
 
   async startRecording() {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      this.mediaRecorder = new MediaRecorder(stream);
-      this.audioChunks = [];
-      this.errorMessage = '';
-      this.transcriptionText = ''; // Clear previous transcription
-
-      this.mediaRecorder.addEventListener('dataavailable', (event) => {
-        if (event.data.size > 0) {
-          this.audioChunks.push(event.data);
-        }
-      });
-
-      this.mediaRecorder.addEventListener('stop', () => {
-        const audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
-        this.sendAudioForTranscription(audioBlob);
-      });
-
-      this.mediaRecorder.start();
       this.isRecording = true;
+      this.errorMessage = '';
+      this.transcriptionText = '';
+
+      await this.audioRecorderService.startRecording(this.sessionId);
     } catch (error) {
       this.errorMessage = 'Erro ao acessar o microfone. Verifique as permissões.';
+      this.isRecording = false;
     }
   }
 
   stopRecording() {
-    if (this.mediaRecorder && this.isRecording) {
+    if (this.isRecording) {
       this.isRecording = false;
       this.isProcessing = true;
-      this.mediaRecorder.stop();
-      this.mediaRecorder.stream.getTracks().forEach(track => track.stop());
+      this.audioRecorderService.stopRecording(this.sessionId).subscribe((res) => {
+        this.isProcessing = false;
+      });
     }
-  }
-
-  private sendAudioForTranscription(audioBlob: Blob) {
-    this.transcriptionService.liveTranscribe(audioBlob).subscribe({
-      next: (result) => {
-        this.transcriptionText = result.transcribedText;
-        this.isProcessing = false;
-        this.audioChunks = []; // Clear chunks after successful transcription
-      },
-      error: (error) => {
-        this.errorMessage = error;
-        this.isProcessing = false;
-        this.audioChunks = []; // Clear chunks on error
-      }
-    });
-  }
-
-  clearTranscription() {
-    this.transcriptionText = '';
-    this.errorMessage = '';
   }
 
   copyToClipboard() {
     if (this.transcriptionText) {
-      navigator.clipboard.writeText(this.transcriptionText);
+      navigator.clipboard.writeText(this.transcriptionText)
+        .then(() => {
+          console.log('Texto copiado com sucesso!');
+        })
+        .catch(err => {
+          this.errorMessage = 'Erro ao copiar texto para a área de transferência';
+          console.error('Erro ao copiar:', err);
+        });
     }
   }
 
   downloadText() {
-    if (this.transcriptionText) {
-      const blob = new Blob([this.transcriptionText], { type: 'text/plain' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'live-transcription.txt';
-      a.click();
-      window.URL.revokeObjectURL(url);
-    }
+    if (!this.transcriptionText) return;
+
+    const blob = new Blob([this.transcriptionText], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'transcricao.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   }
 
+  // downloadAudio() {
+  //   // if (!this.audioBlob) return;
+
+  //   const url = URL.createObjectURL(this.audioBlob);
+  //   const a = document.createElement('a');
+  //   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+
+  //   a.href = url;
+  //   a.download = `gravacao-${timestamp}.webm`; // Changed to .webm as per service
+  //   document.body.appendChild(a);
+  //   a.click();
+  //   document.body.removeChild(a);
+  //   URL.revokeObjectURL(url);
+  // }
+
   getWordCount(text: string): number {
-    return text ? text.trim().split(/\s+/).length : 0;
+    return text.trim().split(/\s+/).filter(word => word.length > 0).length;
+  }
+
+  clearTranscription() {
+    this.transcriptionText = '';
+    // this.audioBlob = null;
+    this.errorMessage = '';
   }
 
   ngOnDestroy() {
